@@ -1,22 +1,24 @@
-var express = require('express');
+const express = require('express');
 const app = express()
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
-
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+let numUsers = 0;
 app.use(express.static('dist'))
 app.get('/', (req, res) => res.render('index'))
 
 io.on('connection', function (socket) {
     console.log('a user connected');
-    socket.broadcast.emit('hi');
+    socket.on('registerUser', () => {
+        const userID = ++numUsers;
+        console.log('new user is registered :', userID);
+        socket.emit('newUserDetails', userID);
+    });
     socket.on('disconnect', function () {
         console.log('user disconnected');
     });
-    socket.on('chat message', function (msg) {
-        io.emit('chat message', msg);
-    });
 });
 
-app.listen(3000, function () {
-    console.log('listening on *:3000');
-});
+http.listen(3000)
+// app.listen(3000, function () {
+//     console.log('listening on *:3000');
+// });
