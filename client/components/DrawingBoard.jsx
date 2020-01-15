@@ -1,39 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import LineSegment from './LineSegment.jsx'
 
-const DrawingBoard = () => {
-    const [path, setPath] = useState([])
+const DrawingBoard = ({ addToPath }) => {
+
     const [drawing, setDrawing] = useState(false)
 
     const handleDrawStart = (e) => {
-        const coordinates = [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
-        console.log("mouse down: ", coordinates)
         setDrawing(true)
-        setPath([...path, coordinates])
+        addToPath({
+            x: e.nativeEvent.offsetX,
+            y: e.nativeEvent.offsetY
+        })
     }
 
     const handleDrawing = (e) => {
         if (drawing) {
-            const coordinates = [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
-            console.log("mouse move: ", coordinates)
-            setPath([...path, coordinates])
+            addToPath({
+                x: e.nativeEvent.offsetX,
+                y: e.nativeEvent.offsetY
+            })
         }
     }
-    const handleDrawEnd = () => {
-        console.log("draw end")
+    const handleDrawEnd = (e) => {
         setDrawing(false)
+        addToPath({
+            x: null,
+            y: null
+        })
     }
-    return <div>
-        <canvas id="drawing-board"
-            onPointerDown={handleDrawStart}
-            onPointerMove={handleDrawing}
-            onPointerUp={handleDrawEnd} onPointerOut={handleDrawEnd} />
-        {path.map((point, i) => {
-            if (i !== 0) {
-                return <LineSegment pointA={path[i - 1]} pointB={point} />
-            }
-        })}
-    </div>
+    return <canvas id="drawing-board" width='500' height='500'
+        onPointerDown={handleDrawStart}
+        onPointerMove={handleDrawing}
+        onPointerUp={handleDrawEnd} onPointerOut={handleDrawEnd} >
+        Your browser doesn't support the HTML5 canvas tag.
+            </canvas>
 
 
 }

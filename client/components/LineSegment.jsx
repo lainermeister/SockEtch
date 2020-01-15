@@ -4,10 +4,10 @@ const LineSegment = ({ pointA, pointB }) => {
     var c = document.getElementById("drawing-board");
     var ctx = c.getContext("2d");
     ctx.beginPath();
-    ctx.moveTo(pointA[0], pointA[1]);
-    ctx.lineTo(pointB[0], pointB[1]);
+    ctx.moveTo(pointA.x, pointA.y);
+    ctx.lineTo(pointB.x, pointB.y);
+    ctx.strokeStyle = pointB.color
     ctx.stroke();
-    console.log(ctx)
 
     return <></>
 }
