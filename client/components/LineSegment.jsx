@@ -11,7 +11,6 @@ const LineSegment = ({ pointA, pointB }) => {
         ctx.stroke();
 
     }
-
     return <></>
 }
 

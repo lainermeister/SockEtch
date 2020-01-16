@@ -3,7 +3,7 @@ import GuessingForm from './GuessingForm.jsx'
 import DrawingBoard from './DrawingBoard.jsx'
 import Path from './Path.jsx'
 import ColorSelector from './ColorSelector.jsx'
-// import { getRandomWord } from "../../server/helpers"
+import UserList from './UserList'
 import socketIOClient from "socket.io-client";
 const socket = socketIOClient('http://localhost:3000');
 
@@ -15,37 +15,32 @@ const App = () => {
     const [gameState, setGameState] = useState("pre")
     const [guesser, setGuesser] = useState(true)
     const [name, setName] = useState("")
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState({})
 
     const startSocket = (e) => {
         e.preventDefault()
         socket.emit('registerUser', name);
-        socket.on('newUserDetails', ({ drawer, word, path, users }) => {
+        socket.on('gameDetails', ({ drawer, word, path, users, state }) => {
             setWord(word)
             setGuesser(drawer !== socket.id)
             setPath(path)
             setUsers(users)
-            setGameState("playing")
+            setGameState(state)
         });
-        socket.on('updatedPath', path => {
-            setPath(path)
-            console.log("updating path")
-        })
+        socket.on('updatedPath', path => setPath(path))
 
     }
     const addToPath = (point) => {
         if (!guesser) {
             point.color = color
-            socket.emit('updatePath', [...path, point])
+            socket.emit('addToPath', point)
         }
     }
     const handleWin = () => {
-        setGameState("end")
+        socket.emit("endGame")
     }
     const handleReset = () => {
-        setGuessing(false);
-        setPath([]);
-        setGameInPlay(true)
+        socket.emit('resetGame')
     }
 
     const renderStartPrompt = () => {
@@ -59,32 +54,28 @@ const App = () => {
         return <>
             {guesser ? <>
                 <GuessingForm word={word} handleWin={handleWin} />
-
             </>
                 : <>
                     <ColorSelector setColor={setColor} />
                     <h1>{word}</h1>
-
                 </>}
             <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
             <Path path={path} />
+            <UserList users={users} />
         </>
     }
     const renderGameEnd = () => {
         return <>
             <h1>You won.</h1>
-            <button onClick={handleReset}>Try Again</button>
+            <button onClick={handleReset}>Next Game</button>
         </>
     }
     if (gameState === "pre") {
         return renderStartPrompt()
     } else if (gameState === "playing") {
         return renderPlaying()
-
     } else {
         return renderGameEnd()
     }
-
-
 }
 export default App;

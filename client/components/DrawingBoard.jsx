@@ -28,7 +28,7 @@ const DrawingBoard = ({ addToPath, setGuessing }) => {
             y: null
         })
     }
-    return <canvas id="drawing-board" width='500' height='500'
+    return <canvas id="drawing-board" width='500' height='400'
         onPointerDown={handleDrawStart}
         onPointerMove={handleDrawing}
         onPointerUp={handleDrawEnd} onPointerOut={handleDrawEnd} >

@@ -4,44 +4,68 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const { getRandomWord } = require('./helpers')
 
-const game = {
+let game = {
     drawer: "",
     word: "",
     path: [],
-    users: []
+    users: {},
+    state: "playing"
 }
 
 io.on('connection', function (socket) {
-    console.log('a user connected');
-    socket.on('registerUser', (name) => {
-        console.log("my id: " + socket.id)
-        game.users.push({ name, id: socket.id })
-        if (game.drawer === "") {
-            game.drawer = socket.id
+
+    const launchGame = (id) => {
+        game.state = "playing"
+        if (game.drawer === "" || game.drawer === id) {
+            console.log(id)
+            console.log(JSON.stringify(game))
+            game.drawer = id
+            game.users[id].drawer = true
             getRandomWord()
                 .then((word) => {
                     game.word = word
-                    console.log(JSON.stringify(game))
-                    socket.emit('newUserDetails', game);
+                    game.path = []
+                    io.emit('gameDetails', game);
                 })
         } else {
-            console.log(JSON.stringify(game))
-            socket.emit('newUserDetails', game);
-            socket.emit('updatedPath', game.path)
+            io.emit('gameDetails', game);
         }
+    }
 
+    socket.on('registerUser', (name) => {
+        game.users[socket.id] = { name, drawer: false }
+        launchGame(socket.id)
     });
 
-    socket.on('updatePath', (path) => {
-        game.path = path;
-        io.emit('updatedPath', path)
+    socket.on('addToPath', (point) => {
+        game.path = [...game.path, point];
+        io.emit('updatedPath', game.path)
+    })
+
+    socket.on('endGame', () => {
+        game.users[game.drawer].drawer = false;
+        game = {
+            drawer: socket.id,
+            word: "",
+            path: [],
+            state: "end",
+            users: game.users
+        }
+        io.emit('gameDetails', game);
+    })
+
+    socket.on('resetGame', () => {
+        console.log("resetting game")
+        launchGame(socket.id)
     })
 
     socket.on('disconnect', function () {
         console.log('user disconnected');
+        delete game.users[socket.id]
         if (game.drawer === socket.id) {
             game.drawer = "";
         }
+        io.emit('gameDetails', game);
     });
 });
 
