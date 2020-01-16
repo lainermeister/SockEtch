@@ -13,6 +13,7 @@ const GuessingForm = ({ word, handleWin }) => {
         }
     }
     return <form onSubmit={submitGuess}>
+        <label>Type your guess below:</label>
         <input type="text" id="guess-field" value={guess}
             onChange={(e) => {
                 setGuess(e.target.value)

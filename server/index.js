@@ -2,32 +2,46 @@ const express = require('express');
 const app = express()
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-let numUsers = 0;
 const { getRandomWord } = require('./helpers')
-let word = "";
-let path = [];
+
+const game = {
+    drawer: "",
+    word: "",
+    path: [],
+    users: []
+}
 
 io.on('connection', function (socket) {
     console.log('a user connected');
-    socket.on('registerUser', () => {
-        const userID = ++numUsers;
-        console.log('new user is registered :', userID);
-        if (userID === 1) {
+    socket.on('registerUser', (name) => {
+        console.log("my id: " + socket.id)
+        game.users.push({ name, id: socket.id })
+        if (game.drawer === "") {
+            game.drawer = socket.id
             getRandomWord()
                 .then((word) => {
-                    word = word
-                    socket.emit('newUserDetails', { userID, word });
+                    game.word = word
+                    console.log(JSON.stringify(game))
+                    socket.emit('newUserDetails', game);
                 })
+        } else {
+            console.log(JSON.stringify(game))
+            socket.emit('newUserDetails', game);
+            socket.emit('updatedPath', game.path)
         }
+
     });
 
     socket.on('updatePath', (path) => {
-        path = path;
+        game.path = path;
         io.emit('updatedPath', path)
     })
 
     socket.on('disconnect', function () {
         console.log('user disconnected');
+        if (game.drawer === socket.id) {
+            game.drawer = "";
+        }
     });
 });
 
