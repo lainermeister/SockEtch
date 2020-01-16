@@ -28,19 +28,12 @@ const App = () => {
             setGameState(state)
         });
         socket.on('updatedPath', path => setPath(path))
-
     }
     const addToPath = (point) => {
         if (!guesser) {
             point.color = color
             socket.emit('addToPath', point)
         }
-    }
-    const handleWin = () => {
-        socket.emit("endGame")
-    }
-    const handleReset = () => {
-        socket.emit('resetGame')
     }
 
     const renderStartPrompt = () => {
@@ -53,7 +46,7 @@ const App = () => {
     const renderPlaying = () => {
         return <>
             {guesser ? <>
-                <GuessingForm word={word} handleWin={handleWin} />
+                <GuessingForm word={word} handleWin={() => socket.emit("endGame")} />
             </>
                 : <>
                     <ColorSelector setColor={setColor} />
@@ -67,7 +60,7 @@ const App = () => {
     const renderGameEnd = () => {
         return <>
             <h1>You won.</h1>
-            <button onClick={handleReset}>Next Game</button>
+            <button onClick={() => socket.emit('resetGame')}>Next Game</button>
         </>
     }
     if (gameState === "pre") {

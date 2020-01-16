@@ -17,8 +17,6 @@ io.on('connection', function (socket) {
     const launchGame = (id) => {
         game.state = "playing"
         if (game.drawer === "" || game.drawer === id) {
-            console.log(id)
-            console.log(JSON.stringify(game))
             game.drawer = id
             game.users[id].drawer = true
             getRandomWord()
@@ -55,12 +53,10 @@ io.on('connection', function (socket) {
     })
 
     socket.on('resetGame', () => {
-        console.log("resetting game")
         launchGame(socket.id)
     })
 
     socket.on('disconnect', function () {
-        console.log('user disconnected');
         delete game.users[socket.id]
         if (game.drawer === socket.id) {
             game.drawer = "";

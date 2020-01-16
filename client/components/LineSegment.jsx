@@ -9,9 +9,11 @@ const LineSegment = ({ pointA, pointB }) => {
         ctx.lineTo(pointB.x, pointB.y);
         ctx.strokeStyle = pointB.color
         ctx.stroke();
+        return <></>
 
+    } else {
+        return <div>Click to reveal drawing.</div>
     }
-    return <></>
 }
 
 export default LineSegment;
