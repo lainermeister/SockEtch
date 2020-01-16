@@ -22,17 +22,17 @@ const App = () => {
         e.preventDefault()
         socket.emit('registerUser', name);
         socket.on('gameDetails', ({ drawer, word, path, users, state, categories }) => {
+            setCategories(categories)
             setWord(word)
             setDrawer(drawer)
             setPath(path)
             setUsers(users)
             setGameState(state)
-            setCategories(categories)
         });
         socket.on('updatedPath', path => setPath(path))
     }
     const addToPath = (point) => {
-        if (socket.id === drawer.id) {
+        if (socket.id === drawer.current.id) {
             point.color = color
             socket.emit('addToPath', point)
         }
@@ -45,23 +45,24 @@ const App = () => {
         </form>
     }
     const renderChoosingCategory = () => {
-        console.log(drawer, socket.id)
-        if (drawer.id === socket.id) {
+        console.log(`categories ${categories}`)
+        if (drawer.current.id === socket.id) {
             return <>
                 <h1>Choose a category </h1>
-                {categories.map((category) => <>{category}</>)}
+                {categories.map((category) => <button key={category}
+                    onClick={() => socket.emit("chooseWord", category)}>{category}</button>)}
             </>
 
         } else {
             return <>
-                <h1>{drawer.name} is picking a category</h1>
+                <h1>{drawer.current.name} is picking a category</h1>
             </>
         }
     }
 
     const renderPlaying = () => {
         return <>
-            {drawer.id === socket.id ? <>
+            {drawer.current.id !== socket.id ? <>
                 <GuessingForm word={word} handleWin={() => socket.emit("endGame")} />
             </>
                 : <>
@@ -74,8 +75,14 @@ const App = () => {
         </>
     }
     const renderGameEnd = () => {
+        let message = <h1>{drawer.current.name} guessed it!</h1>
+        if (drawer.previous.id === socket.id) {
+            message = <h1>Great drawing! {drawer.current.name} guessed it!</h1>
+        } else if (drawer.current.id === socket.id) {
+            message = <h1>Congrats! You guessed it! </h1>
+        }
         return <>
-            <h1>You won.</h1>
+            {message}
             <button onClick={() => socket.emit('resetGame')}>Next Game</button>
         </>
     }

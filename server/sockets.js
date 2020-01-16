@@ -1,5 +1,5 @@
 let game = {
-    drawer: null,
+    drawer: { current: null, previous: null },
     word: "",
     path: [],
     users: {},
@@ -13,15 +13,14 @@ module.exports = (socket, io) => {
 
     const launchGame = async (id) => {
         game.state = "playing"
-        if (game.drawer === null || game.drawer.id === id) {
-            game.drawer = game.users[id]
+        if (game.drawer.current === null || game.drawer.current.id === id) {
+            game.drawer.current = game.users[id]
             game.users[id].drawer = true
         }
         if (game.word === "") {
             game.categories = await getCategories();
             game.state = "choosingCategory"
             io.emit('gameDetails', game)
-
         }
         else {
             io.emit('gameDetails', game);
@@ -34,8 +33,9 @@ module.exports = (socket, io) => {
     });
 
     socket.on('chooseWord', async (category) => {
-        game.word = await getRandomWord('food')
+        game.word = await getRandomWord(category)
         game.path = []
+        game.state = "playing"
         io.emit('gameDetails', game);
     })
 
@@ -45,9 +45,12 @@ module.exports = (socket, io) => {
     })
 
     socket.on('endGame', () => {
-        game.users[game.drawer].drawer = false;
+        game.users[game.drawer.current.id].drawer = false;
         game = {
-            drawer: game.users[socket.id],
+            drawer: {
+                previous: { ...game.drawer.current },
+                current: game.users[socket.id]
+            },
             word: "",
             path: [],
             state: "end",
@@ -62,8 +65,8 @@ module.exports = (socket, io) => {
 
     socket.on('disconnect', function () {
         delete game.users[socket.id]
-        if (game.drawer && game.drawer.id === socket.id) {
-            game.drawer = null;
+        if (game.drawer.current && game.drawer.current.id === socket.id) {
+            game.drawer.current = null;
         }
         io.emit('gameDetails', game);
     });

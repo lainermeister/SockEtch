@@ -5,7 +5,7 @@ const UserList = ({ users }) => {
         <h2>Currently Playing</h2>
         {
             Object.keys(users).map((id) => {
-                return <p>{users[id].name}</p>
+                return <p key={id}>{users[id].name}</p>
             })}
     </>
 }
