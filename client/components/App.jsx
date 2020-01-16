@@ -3,11 +3,9 @@ import GuessingForm from './GuessingForm.jsx'
 import DrawingBoard from './DrawingBoard.jsx'
 import Path from './Path.jsx'
 import ColorSelector from './ColorSelector.jsx'
-import { getRandomWord } from "../helpers"
-
+// import { getRandomWord } from "../../server/helpers"
 import socketIOClient from "socket.io-client";
 const socket = socketIOClient('http://localhost:3000');
-console.log(socket)
 
 const App = () => {
     const [word, setWord] = useState("")
@@ -18,41 +16,43 @@ const App = () => {
     const [guesser, setGuesser] = useState(true)
 
     useEffect(() => {
-        randomizeWord()
-        startSocket((err, userID) => {
-            console.log("socket connection successful: " + userID)
-            if (userID === 1) {
+        startSocket((err, data) => {
+            console.log("socket connection successful: " + data.userID)
+            if (data.userID === 1) {
                 setGuesser(false)
             }
+            setWord(data.word)
         })
     }, [])
 
     const startSocket = (cb) => {
         socket.emit('registerUser');
-        socket.on('newUserDetails', userID => cb(null, userID));
+        socket.on('newUserDetails', data => cb(null, data));
+        socket.on('updatedPath', path => {
+            setPath(path)
+            console.log("updating path")
+        })
     }
     const addToPath = (point) => {
-        point.color = color
-        setPath([...path, point])
+        if (!guesser) {
+            point.color = color
+            socket.emit('updatePath', [...path, point])
+        }
     }
-    const randomizeWord = () => {
-        getRandomWord().then((word) => setWord(word))
-    }
+
 
     const handleWin = () => {
         setGameInPlay(false)
     }
     const handleReset = () => {
-        randomizeWord();
         setGuessing(false);
         setPath([]);
         setGameInPlay(true)
     }
     if (gameInPlay) {
         return <>
-
             <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
-            {guessing ? <GuessingForm word={word} handleWin={handleWin} />
+            {guesser ? <GuessingForm word={word} handleWin={handleWin} />
                 :
                 <h1>{word}</h1>}
             <ColorSelector setColor={setColor} />
