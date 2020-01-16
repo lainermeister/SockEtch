@@ -13,24 +13,26 @@ const App = () => {
     const [path, setPath] = useState([])
     const [color, setColor] = useState('#393E41')
     const [gameState, setGameState] = useState("pre")
-    const [guesser, setGuesser] = useState(true)
+    const [drawer, setDrawer] = useState(null)
     const [name, setName] = useState("")
     const [users, setUsers] = useState({})
+    const [categories, setCategories] = useState([])
 
     const startSocket = (e) => {
         e.preventDefault()
         socket.emit('registerUser', name);
-        socket.on('gameDetails', ({ drawer, word, path, users, state }) => {
+        socket.on('gameDetails', ({ drawer, word, path, users, state, categories }) => {
             setWord(word)
-            setGuesser(drawer !== socket.id)
+            setDrawer(drawer)
             setPath(path)
             setUsers(users)
             setGameState(state)
+            setCategories(categories)
         });
         socket.on('updatedPath', path => setPath(path))
     }
     const addToPath = (point) => {
-        if (!guesser) {
+        if (socket.id === drawer.id) {
             point.color = color
             socket.emit('addToPath', point)
         }
@@ -42,10 +44,24 @@ const App = () => {
             <input value={name} onChange={(e) => setName(e.target.value)} />
         </form>
     }
+    const renderChoosingCategory = () => {
+        console.log(drawer, socket.id)
+        if (drawer.id === socket.id) {
+            return <>
+                <h1>Choose a category </h1>
+                {categories.map((category) => <>{category}</>)}
+            </>
+
+        } else {
+            return <>
+                <h1>{drawer.name} is picking a category</h1>
+            </>
+        }
+    }
 
     const renderPlaying = () => {
         return <>
-            {guesser ? <>
+            {drawer.id === socket.id ? <>
                 <GuessingForm word={word} handleWin={() => socket.emit("endGame")} />
             </>
                 : <>
@@ -65,6 +81,8 @@ const App = () => {
     }
     if (gameState === "pre") {
         return renderStartPrompt()
+    } else if (gameState === "choosingCategory") {
+        return renderChoosingCategory()
     } else if (gameState === "playing") {
         return renderPlaying()
     } else {
