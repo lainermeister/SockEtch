@@ -1,7 +1,10 @@
 // docker run --name etch  -p 27018:27017 -v $PWD/data:/data/db -d mongo
 
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb://localhost:27018';
+const url = process.env.NODE_ENV === "development" ?
+    'mongodb://mongo:27017' :
+    'mongodb://heroku_9nm9b5rt:d7j4faf38vrm6b4khr70412d63@ds263928.mlab.com:63928/heroku_9nm9b5rt';
+console.log("URL set to: " + url)
 const dbName = 'etch';
 const client = new MongoClient(url, { useUnifiedTopology: true });
 

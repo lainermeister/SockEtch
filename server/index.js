@@ -7,7 +7,7 @@ const socketRoutes = require('./sockets')
 
 io.on('connection', (socket) => socketRoutes(socket, io));
 
-http.listen(3000)
+http.listen(process.env.PORT || 3000)
 
 app.use(express.static('dist'))
 app.get('/', (req, res) => res.render('index'))
