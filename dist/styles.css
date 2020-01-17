@@ -12,7 +12,7 @@
     --title-background: #27544e;
 }
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input {
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input, button {
     margin: 0;
     padding: 0;
     border: 0;
@@ -69,11 +69,13 @@ h3 {
 }
 
 #app-container {
-    width: 600px;
-    height: 600px;
+    width: 900px;
+    height: 500px;
     margin: auto;
     margin-top: 15px;
     background-color: var(--background-color);
+    align-items: center;
+    justify-content: space-between
 }
 
 #site-title {
@@ -91,11 +93,21 @@ h3 {
 }
 
 #play-area {
-    display: flex
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding: 1.5em;
+    padding-top: .5em
+}
+
+#drawing-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .prompt {
-    margin-top: 100px;
+    margin-top: 50px;
 }
 
 .textbox {
@@ -104,13 +116,14 @@ h3 {
     width: 12em;
     color: var(--color);
     text-align: center;
+    margin-bottom: 1em
 }
 
 .category-container {
     margin: 25px;
 }
 
-.category {
+button {
     background-color: var(--translucent-background-color);
     color: var(--color);
     width: 100px;
@@ -119,9 +132,39 @@ h3 {
     border: 0px
 }
 
+#color-picker {
+    display: flex;
+    flex-flow: column wrap;
+    align-self: center;
+    margin: 1em;
+}
+
 .color-buttons {
     width: 50px;
     height: 50px;
+}
+
+#right-col {
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#user-list {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-end;
+}
+
+#guessing-form {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-end;
+}
+
+.username {
+    margin: .4em;
 }
 
 #drawing-board {

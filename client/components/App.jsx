@@ -86,36 +86,45 @@ const App = () => {
     return (
       <div id="play-area">
         {drawer.current.id !== socket.id ? (
-          <div className="prompt">
+          <div className="prompt"></div>
+        ) : (
+          <ColorSelector setColor={setColor} />
+        )}
+        <div id="drawing-col">
+          {drawer.current.id === socket.id ? (
+            <h2>{word}</h2>
+          ) : (
+            <h2>{drawer.current.name} is drawing.</h2>
+          )}
+          <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
+          <Path path={path} />
+        </div>
+        <div id="right-col">
+          <UserList users={users} />
+          {drawer.current.id === socket.id ? (
+            <></>
+          ) : (
             <GuessingForm
               word={word}
               handleWin={() => socket.emit("endGame")}
             />
-          </div>
-        ) : (
-          <div className="prompt">
-            <ColorSelector setColor={setColor} />
-            <h2>{word}</h2>
-          </div>
-        )}
-        <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
-        <Path path={path} />
-        <UserList users={users} />
+          )}
+        </div>
       </div>
     );
   };
   const renderGameEnd = () => {
-    let message = <h1>{drawer.current.name} guessed it!</h1>;
+    let message = <h2>{drawer.current.name} guessed it!</h2>;
     if (drawer.previous.id === socket.id) {
-      message = <h1>Great drawing! {drawer.current.name} guessed it!</h1>;
+      message = <h2>Great drawing! {drawer.current.name} guessed it!</h2>;
     } else if (drawer.current.id === socket.id) {
-      message = <h1>Congrats! You guessed it! </h1>;
+      message = <h2>Congrats! You guessed it! </h2>;
     }
     return (
-      <>
+      <div className="prompt">
         {message}
         <button onClick={() => socket.emit("resetGame")}>Next Game</button>
-      </>
+      </div>
     );
   };
   if (gameState === "pre") {
