@@ -1,6 +1,6 @@
 let game = {
     drawer: { current: null, previous: null },
-    word: "",
+    word: null,
     path: [],
     users: {},
     state: "playing",
@@ -8,16 +8,17 @@ let game = {
 }
 
 const { getCategories, getRandomWord } = require('../db')
+const { getRandomNumber } = require('../db/helpers')
 
 module.exports = (socket, io) => {
 
     const launchGame = async (id) => {
         game.state = "playing"
         if (game.drawer.current === null || game.drawer.current.id === id) {
-            game.drawer.current = game.users[id]
+            game.drawer.current = { ...game.users[id] }
             game.users[id].drawer = true
         }
-        if (game.word === "") {
+        if (!game.word) {
             game.categories = await getCategories();
             game.state = "choosingCategory"
             io.emit('gameDetails', game)
@@ -49,9 +50,9 @@ module.exports = (socket, io) => {
         game = {
             drawer: {
                 previous: { ...game.drawer.current },
-                current: game.users[socket.id]
+                current: { ...game.users[socket.id] }
             },
-            word: "",
+            word: null,
             path: [],
             state: "end",
             users: game.users
@@ -64,9 +65,19 @@ module.exports = (socket, io) => {
     })
 
     socket.on('disconnect', function () {
+        console.log("disconnected")
         delete game.users[socket.id]
         if (game.drawer.current && game.drawer.current.id === socket.id) {
-            game.drawer.current = null;
+            game.word = null;
+            game.drawer.previous = { ...game.drawer.current }
+            const userIDs = Object.keys(game.users)
+            if (userIDs.length !== 0) {
+                const nextDrawerID = userIDs[getRandomNumber(userIDs.length)]
+                game.drawer.current = { ...game.users[nextDrawerID] };
+            } else {
+                game.drawer.current = null;
+            }
+            game.state = "choosingCategory"
         }
         io.emit('gameDetails', game);
     });

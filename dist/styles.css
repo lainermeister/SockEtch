@@ -1,6 +1,122 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Shadows+Into+Light&display=swap');
+:root {
+    --color: #ededed;
+    --background-color: rgb(37, 37, 37);
+    --translucent-background-color: rgba(80, 80, 80, 0.6);
+    --primary-accent-color: #949494;
+    --secondary-background-color: rgba(65, 65, 65, 0.7);
+    --error: #ff0000;
+    --highlighted: #8a6a30;
+    --link-color: #6fa5a5;
+    --title-color: #ffffff;
+    --title-background: #27544e;
+}
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+:focus {
+    text-decoration: none;
+    outline: none;
+}
+
+/* HTML5 display-role reset for older browsers */
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+body {
+    line-height: 1;
+    background-color: var(--secondary-background-color);
+    color: var(--color);
+    font-family: 'Source Sans Pro', san-serif;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+h2 {
+    font-weight: 700;
+    font-size: 1.5em;
+    margin: .7em;
+}
+
+h3 {
+    font-size: 1.2em;
+    margin: 5px;
+}
+
+#app-container {
+    width: 600px;
+    height: 600px;
+    margin: auto;
+    margin-top: 15px;
+    background-color: var(--background-color);
+}
+
+#site-title {
+    color: var(--title-color);
+    background-color: var(--title-background);
+    font-size: 2.7em;
+    padding: .3em;
+    text-align: center;
+    font-family: 'Shadows Into Light', cursive;
+}
+
 #app {
     margin: auto;
     text-align: center;
+}
+
+#play-area {
+    display: flex
+}
+
+.prompt {
+    margin-top: 100px;
+}
+
+.textbox {
+    background-color: var(--translucent-background-color);
+    height: 3em;
+    width: 12em;
+    color: var(--color);
+    text-align: center;
+}
+
+.category-container {
+    margin: 25px;
+}
+
+.category {
+    background-color: var(--translucent-background-color);
+    color: var(--color);
+    width: 100px;
+    height: 50px;
+    font-size: 1em;
+    border: 0px
 }
 
 .color-buttons {
@@ -9,7 +125,7 @@
 }
 
 #drawing-board {
-    border: 1px solid black;
+    background-color: var(--translucent-background-color);
     padding-left: 0;
     padding-right: 0;
     margin-left: auto;
