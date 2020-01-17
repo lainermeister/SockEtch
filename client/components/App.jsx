@@ -5,7 +5,8 @@ import Path from './Path.jsx'
 import ColorSelector from './ColorSelector.jsx'
 import UserList from './UserList'
 import socketIOClient from "socket.io-client";
-const socket = socketIOClient('http://localhost:3000');
+const url = 
+const socket = socketIOClient(window.location.href);
 
 const App = () => {
     const [word, setWord] = useState("")
