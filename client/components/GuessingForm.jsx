@@ -26,7 +26,11 @@ const GuessingForm = ({ word, handleWin, handleWrongGuess }) => {
           setWrongAnswer(false);
         }}
       />
-      {wrongAnswer ? <label>Wrong answer, please try again</label> : <></>}
+      {wrongAnswer ? (
+        <label className="error-message">Wrong answer, please try again</label>
+      ) : (
+        <></>
+      )}
     </form>
   );
 };

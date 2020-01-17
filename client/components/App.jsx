@@ -22,26 +22,44 @@ const App = () => {
   const [categories, setCategories] = useState([]);
   const [guesses, setGuesses] = useState([]);
   const [category, setCategory] = useState(null);
+  const [nameError, setNameError] = useState(false);
+  useEffect(() => {
+    setNameError(false);
+  }, [name]);
 
   const startSocket = (e) => {
     e.preventDefault();
-    socket.emit("registerUser", name);
-    socket.on(
-      "gameDetails",
-      ({ drawer, word, path, users, state, categories, guesses, category }) => {
-        setCategories(categories);
-        setWord(word);
-        setDrawer(drawer);
-        setPath(path);
-        setUsers(users);
-        setGameState(state);
-        setGuesses(guesses);
-        setCategory(category);
-      }
-    );
-    socket.on("updatedPath", (path) => setPath(path));
-    console.log("my socket is " + socket.id);
+    if (name === "") {
+      setNameError(true);
+    } else {
+      socket.emit("registerUser", name);
+      socket.on(
+        "gameDetails",
+        ({
+          drawer,
+          word,
+          path,
+          users,
+          state,
+          categories,
+          guesses,
+          category
+        }) => {
+          setCategories(categories);
+          setWord(word);
+          setDrawer(drawer);
+          setPath(path);
+          setUsers(users);
+          setGameState(state);
+          setGuesses(guesses);
+          setCategory(category);
+        }
+      );
+      socket.on("updatedPath", (path) => setPath(path));
+      console.log("my socket is " + socket.id);
+    }
   };
+
   const addToPath = (point) => {
     if (socket.id === drawer.current.id) {
       point.color = color;
@@ -53,11 +71,24 @@ const App = () => {
     return (
       <form className="prompt" onSubmit={startSocket}>
         <h2>Enter your name:</h2>
-        <input
-          className="textbox"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <div>
+          <input
+            type="text"
+            className="textbox"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div>
+          <input type="button" value="Join Gameroom" onClick={startSocket} />
+        </div>
+        {nameError ? (
+          <div className="error-message">
+            <label>Please enter your name to join.</label>
+          </div>
+        ) : (
+          <></>
+        )}
       </form>
     );
   };
@@ -99,6 +130,14 @@ const App = () => {
 
             <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
             <Path path={path} />
+            <div id="bottom-buttons">
+              <button onClick={() => socket.emit("clearDrawing")}>
+                Clear Drawing
+              </button>
+              <button onClick={() => socket.emit("giveUp")}>
+                Give Up &nbsp;&nbsp;:(
+              </button>
+            </div>
           </div>
           <div id="right-col">
             <UserList users={users} />
@@ -112,7 +151,7 @@ const App = () => {
         <div id="play-area">
           <div className="prompt"></div>
           <div id="drawing-col">
-            <h2>{drawer.current.name} is drawing.</h2>
+            <h2>{drawer.current.name} is drawing</h2>
             <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
             <Path path={path} />
             <h3>Category: {category}</h3>
@@ -128,38 +167,6 @@ const App = () => {
         </div>
       );
     }
-    // return (
-    //   <div id="play-area">
-    //     {drawer.current.id !== socket.id ? (
-    //       <div className="prompt"></div>
-    //     ) : (
-    //       <ColorSelector setColor={setColor} />
-    //     )}
-    //     <div id="drawing-col">
-    //       {drawer.current.id === socket.id ? (
-    //         <h2>{word}</h2>
-    //       ) : (
-    //           <h2>{drawer.current.name} is drawing.</h2>
-    //           <h3>Category: {category}</h3>
-    //       )}
-    //       <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
-    //       <Path path={path} />
-    //       {drawer.current.id === socket.id ? <></> : <h3>Category: {category}</h3>}
-    //     </div>
-    //     <div id="right-col">
-    //       <UserList users={users} />
-    //       {drawer.current.id === socket.id ? (
-    //         <Guesses guesses={guesses} />
-    //       ) : (
-    //         <GuessingForm
-    //           word={word}
-    //           handleWrongGuess={(guess) => socket.emit("wrongGuess", guess)}
-    //           handleWin={() => socket.emit("endGame")}
-    //         />
-    //       )}
-    //     </div>
-    //   </div>
-    // );
   };
   const renderGameEnd = () => {
     let message = <h2>{drawer.current.name} guessed it!</h2>;

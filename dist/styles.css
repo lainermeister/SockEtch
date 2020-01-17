@@ -4,14 +4,14 @@
     --background-color: rgb(37, 37, 37);
     --translucent-background-color: rgba(80, 80, 80, 0.6);
     --primary-accent-color: #949494;
-    --secondary-background-color: rgba(65, 65, 65, 0.7);
+    --secondary-background-color: rgba(51, 51, 51, 0.7);
     --error: #ff0000;
     --highlighted: #8a6a30;
     --link-color: #6fa5a5;
     --title-color: #ffffff;
     --title-background: #27544e;
     --app-width: 900px;
-    --app-height: 500px;
+    --app-height: 550px;
 }
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input, button {
@@ -66,12 +66,12 @@ table {
 h2 {
     font-weight: 700;
     font-size: 1.5em;
-    margin: .7em;
+    margin: .5em;
 }
 
 h3 {
     font-size: 1.2em;
-    margin: 5px;
+    margin: 1em;
 }
 
 #app-container {
@@ -81,12 +81,12 @@ h3 {
     margin-top: 15px;
     background-color: var(--background-color);
     align-items: center;
-    justify-content: space-between
+    justify-content: space-between;
+    box-shadow: 1px 1px 2px 2px rgba(71, 71, 71, 0.75);
 }
 
 #site-title {
     color: var(--title-color);
-    background-color: var(--title-background);
     font-size: 2.7em;
     padding: .3em;
     text-align: center;
@@ -104,7 +104,7 @@ h3 {
     justify-content: space-around;
     padding: 1.5em;
     padding-top: .5em;
-    max-height: calc(var(--app-height) * 0.80);
+    height: calc(var(--app-height) * 0.80);
 }
 
 #drawing-col {
@@ -120,24 +120,32 @@ h3 {
 
 .textbox {
     background-color: var(--translucent-background-color);
-    height: 3em;
-    width: 12em;
+    width: calc(var(--app-height) * 0.40);
+    height: calc(var(--app-height) * 0.10);
     color: var(--color);
     text-align: center;
-    margin-bottom: 1em
+}
+
+.error-message {
+    margin-top: 1em;
 }
 
 .category-container {
     margin: 25px;
 }
 
-button {
+.category {
+    margin: 0px;
+}
+
+button, input[type=button] {
     background-color: var(--translucent-background-color);
     color: var(--color);
-    width: 100px;
-    height: 50px;
+    width: calc(var(--app-height) * 0.30);
+    height: calc(var(--app-height) * 0.10);
     font-size: 1em;
-    border: 0px
+    border: 0px;
+    margin: 1em 1em 0em 1em;
 }
 
 #color-picker {
@@ -150,6 +158,7 @@ button {
 .color-buttons {
     width: 50px;
     height: 50px;
+    margin: 0;
 }
 
 #right-col {

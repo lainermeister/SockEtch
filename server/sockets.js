@@ -30,6 +30,24 @@ module.exports = (socket, io) => {
         }
     }
 
+    const passToRandomDrawer = () => {
+        console.log("pass to another drawer")
+        game.word = null;
+        game.drawer.previous = { ...game.drawer.current }
+        game.guesses = [];
+        game.category = null;
+        const userIDs = Object.keys(game.users)
+        if (userIDs.length !== 0) {
+            const nextDrawerID = userIDs[getRandomNumber(userIDs.length)]
+            game.drawer.current = { ...game.users[nextDrawerID] };
+        } else {
+            game.drawer.current = null;
+        }
+        game.state = "choosingCategory"
+        io.emit('gameDetails', game);
+
+    }
+
     socket.on('registerUser', (name) => {
         game.users[socket.id] = { name, drawer: false, id: socket.id }
         launchGame(socket.id)
@@ -47,6 +65,16 @@ module.exports = (socket, io) => {
     socket.on('addToPath', (point) => {
         game.path = [...game.path, point];
         io.emit('updatedPath', game.path)
+    })
+
+    socket.on('clearDrawing', () => {
+        console.log("clearing")
+        game.path = [];
+        io.emit('updatedPath', game.path)
+    })
+
+    socket.on('giveUp', () => {
+        passToRandomDrawer()
     })
 
     socket.on('wrongGuess', (guess) => {
@@ -83,18 +111,7 @@ module.exports = (socket, io) => {
         console.log("disconnected")
         delete game.users[socket.id]
         if (game.drawer.current && game.drawer.current.id === socket.id) {
-            game.word = null;
-            game.drawer.previous = { ...game.drawer.current }
-            game.guesses = [];
-            game.category = null;
-            const userIDs = Object.keys(game.users)
-            if (userIDs.length !== 0) {
-                const nextDrawerID = userIDs[getRandomNumber(userIDs.length)]
-                game.drawer.current = { ...game.users[nextDrawerID] };
-            } else {
-                game.drawer.current = null;
-            }
-            game.state = "choosingCategory"
+            passToRandomDrawer()
         }
         io.emit('gameDetails', game);
     });
