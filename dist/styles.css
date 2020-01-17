@@ -10,6 +10,8 @@
     --link-color: #6fa5a5;
     --title-color: #ffffff;
     --title-background: #27544e;
+    --app-width: 900px;
+    --app-height: 500px;
 }
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input, button {
@@ -24,6 +26,10 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 :focus {
     text-decoration: none;
     outline: none;
+}
+
+::-webkit-scrollbar {
+    width: 0 !important
 }
 
 /* HTML5 display-role reset for older browsers */
@@ -69,8 +75,8 @@ h3 {
 }
 
 #app-container {
-    width: 900px;
-    height: 500px;
+    width: var(--app-width);
+    height: var(-app-height);
     margin: auto;
     margin-top: 15px;
     background-color: var(--background-color);
@@ -90,24 +96,26 @@ h3 {
 #app {
     margin: auto;
     text-align: center;
+    height: calc(var(--app-height) * 0.85);
 }
 
 #play-area {
     display: flex;
-    align-items: flex-start;
     justify-content: space-around;
     padding: 1.5em;
-    padding-top: .5em
+    padding-top: .5em;
+    max-height: calc(var(--app-height) * 0.80);
 }
 
 #drawing-col {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    max-height: 100%;
 }
 
 .prompt {
-    margin-top: 50px;
+    padding-top: 40px;
+    max-height: calc(var(--app-height) * 0.80);
 }
 
 .textbox {
@@ -145,7 +153,8 @@ button {
 }
 
 #right-col {
-    height: 350px;
+    min-height: 100%;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -155,16 +164,42 @@ button {
     display: flex;
     flex-direction: column;
     align-self: flex-end;
+    max-height: 50%;
+    flex-wrap: nowrap;
+    overflow: scroll;
 }
 
 #guessing-form {
     display: flex;
     flex-direction: column;
-    align-self: flex-end;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: 40%;
+    max-height: 40%;
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow: scroll;
+}
+
+#guesses {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 40%;
+    max-height: 40%;
+    width: 100%;
+    overflow: scroll;
+    /* justify-content: flex-end; */
+    /* padding-bottom: .5em; */
+}
+
+.guess-alert {
+    margin: .4em;
 }
 
 .username {
     margin: .4em;
+    align-self: flex-start;
 }
 
 #drawing-board {

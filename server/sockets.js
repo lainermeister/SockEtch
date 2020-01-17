@@ -4,7 +4,9 @@ let game = {
     path: [],
     users: {},
     state: "playing",
-    categories: []
+    categories: [],
+    guesses: [],
+    category: null
 }
 
 const { getCategories, getRandomWord } = require('../db')
@@ -34,6 +36,8 @@ module.exports = (socket, io) => {
     });
 
     socket.on('chooseWord', async (category) => {
+        console.log(category)
+        game.category = category;
         game.word = await getRandomWord(category)
         game.path = []
         game.state = "playing"
@@ -43,6 +47,15 @@ module.exports = (socket, io) => {
     socket.on('addToPath', (point) => {
         game.path = [...game.path, point];
         io.emit('updatedPath', game.path)
+    })
+
+    socket.on('wrongGuess', (guess) => {
+        game.guesses.push({
+            word: guess,
+            name: game.users[socket.id].name,
+            id: game.guesses.length
+        })
+        io.emit('gameDetails', game)
     })
 
     socket.on('endGame', () => {
@@ -55,7 +68,9 @@ module.exports = (socket, io) => {
             word: null,
             path: [],
             state: "end",
-            users: game.users
+            users: game.users,
+            guesses: [],
+            category: null
         }
         io.emit('gameDetails', game);
     })
@@ -70,6 +85,8 @@ module.exports = (socket, io) => {
         if (game.drawer.current && game.drawer.current.id === socket.id) {
             game.word = null;
             game.drawer.previous = { ...game.drawer.current }
+            game.guesses = [];
+            game.category = null;
             const userIDs = Object.keys(game.users)
             if (userIDs.length !== 0) {
                 const nextDrawerID = userIDs[getRandomNumber(userIDs.length)]

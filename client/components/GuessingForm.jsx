@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const GuessingForm = ({ word, handleWin }) => {
+const GuessingForm = ({ word, handleWin, handleWrongGuess }) => {
   const [guess, setGuess] = useState("");
   const [wrongAnswer, setWrongAnswer] = useState(false);
   const submitGuess = (e) => {
@@ -8,6 +8,7 @@ const GuessingForm = ({ word, handleWin }) => {
     if (guess.toLowerCase() === word) {
       handleWin();
     } else {
+      handleWrongGuess(guess);
       setWrongAnswer(true);
       setGuess("");
     }
