@@ -5,7 +5,7 @@ const url = process.env.NODE_ENV === "development" ?
     'mongodb://localhost:27017' :
     process.env.MONGODB_URI;
 console.log("URL set to: " + url)
-const dbName = 'etch';
+const dbName = 'heroku_npq8zsw9';
 const client = new MongoClient(url, { useUnifiedTopology: true });
 
 module.exports = {
