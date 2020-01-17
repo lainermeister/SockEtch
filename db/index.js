@@ -5,8 +5,10 @@ module.exports = {
     getCategories: async () => {
         try {
             !db ? db = await client.connect() : null;
-            const categories = (await db.listCollections()
-                .toArray()).map(({ name }) => name)
+            const categories = [];
+            (await db.listCollections()
+                .toArray()).forEach(({ name }) => 
+                name !== "system.indices" ? categories.push(name) : null)
             return categories;
         } catch (err) { console.log(err) }
     },
