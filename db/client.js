@@ -6,7 +6,7 @@ const url = process.env.NODE_ENV === "development" ?
     process.env.MONGODB_URI;
 const dbName = process.env.NODE_ENV === 'development' ?
     'etch' :
-    process.env.MONGODB_URI.substring(process.env.MONGODB_URI.lastIndexOf("/"));
+    process.env.MONGODB_URI.substring(process.env.MONGODB_URI.lastIndexOf("/") + 1);
 const client = new MongoClient(url, { useUnifiedTopology: true });
 
 module.exports = {
