@@ -62,6 +62,7 @@ module.exports = (socket, io) => {
     })
     socket.on('joinRoom', ({ name, room }) => {
         console.log("joining: " + room)
+        console.log(JSON.stringify(games[room]))
         if (games[room]) {
             users[socket.id] = { name, drawer: false, id: socket.id, room }
             games[room].users[socket.id] = users[socket.id]
@@ -131,15 +132,22 @@ module.exports = (socket, io) => {
     })
 
     socket.on('disconnect', function () {
-        console.log("disconnected")
-        if (users[socket.id] && users[socket.id].room) {
+        console.log("disconnecting" + JSON.stringify(users[socket.id]))
+        if (users[socket.id]) {
             const { room } = users[socket.id]
             delete users[socket.id]
             if (games[room]) {
-                if (games[room].drawer.current && games[room].drawer.current.id === socket.id) {
-                    passToRandomDrawer(room)
+                console.log(games[room])
+                if (Object.keys(games[room].users).length < 2) {
+                    console.log("last user leaving, deleting room")
+                    delete games[room]
+                } else {
+                    delete games[room].users[socket.id]
+                    if (games[room].drawer.current && games[room].drawer.current.id === socket.id) {
+                        passToRandomDrawer(room)
+                    }
+                    io.in(room).emit('gameDetails', games[room]);
                 }
-                io.in(room).emit('gameDetails', games[room]);
             }
         }
     });
