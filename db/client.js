@@ -4,7 +4,9 @@ const MongoClient = require('mongodb').MongoClient;
 const url = process.env.NODE_ENV === "development" ?
     'mongodb://localhost:27017' :
     process.env.MONGODB_URI;
-const dbName = 'heroku_npq8zsw9';
+const dbName = process.env.NODE_ENV === 'development' ?
+    'etch' :
+    process.env.MONGODB_URI.substring(process.env.MONGODB_URI.lastIndexOf("/"));
 const client = new MongoClient(url, { useUnifiedTopology: true });
 
 module.exports = {

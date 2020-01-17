@@ -15,7 +15,7 @@ const GuessingForm = ({ word, handleWin, handleWrongGuess }) => {
   };
   return (
     <form id="guessing-form" onSubmit={submitGuess}>
-      <h3>Type your guess below:</h3>
+      <h3>What's your best guess?</h3>
       <input
         className="textbox"
         type="text"
