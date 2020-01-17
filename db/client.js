@@ -2,8 +2,8 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const url = process.env.NODE_ENV === "development" ?
-    'mongodb://mongo:27017' :
-    'mongodb://heroku_9nm9b5rt:d7j4faf38vrm6b4khr70412d63@ds263928.mlab.com:63928/heroku_9nm9b5rt';
+    'mongodb://localhost:27017' :
+    process.env.MONGODB_URI;
 console.log("URL set to: " + url)
 const dbName = 'etch';
 const client = new MongoClient(url, { useUnifiedTopology: true });
