@@ -1,0 +1,21 @@
+# version: "3.2"
+# services:
+#   mongo:
+#     image: mongo
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - $PWD/data:/data/db
+#   web:
+#     build: .
+#     depends_on:
+#       - mongo
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - ./:/app
+#     command: >
+#       bash -c "npm start"
+
+  
+  
