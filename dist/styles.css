@@ -110,7 +110,7 @@ h3 {
 }
 
 #dynamic-area {
-    margin-top: calc(var(--app-height) * 0.03);
+    margin-top: calc(var(--app-height) * 0.06);
 }
 
 #play-area {

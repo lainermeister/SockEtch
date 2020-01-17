@@ -48,9 +48,9 @@ module.exports = (socket, io) => {
         // while (games[room]) {
         //     room = (await getRandomWord("objects")).toUpperCase();
         // }
-        const room = (getRandomString(4)).toUpperCase();
+        const room = (getRandomString(3)).toUpperCase();
         while (games[room]) {
-            room = (getRandomString(4)).toUpperCase();
+            room = (getRandomString(3)).toUpperCase();
         }
         console.log(room)
         users[socket.id] = { name, drawer: true, id: socket.id, room }

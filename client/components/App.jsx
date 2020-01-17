@@ -81,8 +81,8 @@ const App = () => {
   const renderStartPrompt = () => {
     return (
       <>
-        <h2>Your Name:</h2>
         <form className="prompt" onSubmit={(e) => e.preventDefault()}>
+          <h2>Your Name:</h2>
           <div>
             <input
               type="text"
@@ -201,7 +201,6 @@ const App = () => {
     } else {
       return (
         <div id="play-area">
-          <div className="prompt"></div>
           <div id="drawing-col">
             <h2>{drawer.current.name} is drawing</h2>
             <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
