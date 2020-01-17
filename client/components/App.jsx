@@ -22,17 +22,23 @@ const App = () => {
   const [categories, setCategories] = useState([]);
   const [guesses, setGuesses] = useState([]);
   const [category, setCategory] = useState(null);
-  const [nameError, setNameError] = useState(false);
+  const [joiningRoom, setJoiningRoom] = useState(null);
+  const [joinError, setJoinError] = useState(null);
+  const [room, setRoom] = useState(null);
   useEffect(() => {
-    setNameError(false);
+    setJoinError(null);
   }, [name]);
 
   const startSocket = (e) => {
     e.preventDefault();
     if (name === "") {
-      setNameError(true);
+      setJoinError("Please enter your name to join.");
     } else {
-      socket.emit("registerUser", name);
+      if (joiningRoom) {
+        socket.emit("joinRoom", { name, room });
+      } else {
+        socket.emit("createRoom", name);
+      }
       socket.on(
         "gameDetails",
         ({
@@ -43,7 +49,8 @@ const App = () => {
           state,
           categories,
           guesses,
-          category
+          category,
+          room
         }) => {
           setCategories(categories);
           setWord(word);
@@ -53,8 +60,10 @@ const App = () => {
           setGameState(state);
           setGuesses(guesses);
           setCategory(category);
+          setRoom(room);
         }
       );
+      socket.on("notARoom", () => setJoinError("That is not a valid room."));
       socket.on("updatedPath", (path) => setPath(path));
       console.log("my socket is " + socket.id);
     }
@@ -80,11 +89,28 @@ const App = () => {
           />
         </div>
         <div>
-          <input type="button" value="Join Gameroom" onClick={startSocket} />
+          {joiningRoom === null ? (
+            <input
+              type="button"
+              value="Join Room"
+              onClick={(e) => startSocket(e, "join")}
+            />
+          ) : (
+            <div>
+              <label>Enter Room ID:</label>
+              <input
+                type="text"
+                className="textbox"
+                value={joiningRoom}
+                onChange={(e) => setJoiningRoom(e.target.value)}
+              />
+            </div>
+          )}
+          <input type="button" value="Create Room" onClick={startSocket} />
         </div>
-        {nameError ? (
+        {joinError ? (
           <div className="error-message">
-            <label>Please enter your name to join.</label>
+            <label>{joinError}</label>
           </div>
         ) : (
           <></>

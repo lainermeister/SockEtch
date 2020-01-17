@@ -1,76 +1,91 @@
-let game = {
-    drawer: { current: null, previous: null },
-    word: null,
-    path: [],
-    users: {},
-    state: "playing",
-    categories: [],
-    guesses: [],
-    category: null
-}
+let games = {};
+let users = {};
 
 const { getCategories, getRandomWord } = require('../db')
 const { getRandomNumber } = require('../db/helpers')
 
 module.exports = (socket, io) => {
 
-    const launchGame = async (id) => {
-        game.state = "playing"
-        if (game.drawer.current === null || game.drawer.current.id === id) {
-            game.drawer.current = { ...game.users[id] }
-            game.users[id].drawer = true
+    const launchGame = async (id, room) => {
+        games[room].state = "playing"
+        if (games[room].drawer.current === null || games[room].drawer.current.id === id) {
+            games[room].drawer.current = users[id]
+            users[id].drawer = true
         }
-        if (!game.word) {
-            game.categories = await getCategories();
-            game.state = "choosingCategory"
-            io.emit('gameDetails', game)
+        if (!games[room].word) {
+            games[room].categories = await getCategories();
+            games[room].state = "choosingCategory"
+            io.in(room).emit('gameDetails', games[room])
         }
         else {
-            io.emit('gameDetails', game);
+            io.in(room).emit('gameDetails', games[room]);
         }
     }
 
-    const passToRandomDrawer = () => {
+    const passToRandomDrawer = (room) => {
         console.log("pass to another drawer")
-        game.word = null;
-        game.drawer.previous = { ...game.drawer.current }
-        game.guesses = [];
-        game.category = null;
-        const userIDs = Object.keys(game.users)
+        games[room].word = null;
+        games[room].drawer.previous = { ...games[room].drawer.current }
+        games[room].guesses = [];
+        games[room].category = null;
+        const userIDs = Object.keys(games[room].users)
         if (userIDs.length !== 0) {
             const nextDrawerID = userIDs[getRandomNumber(userIDs.length)]
-            game.drawer.current = { ...game.users[nextDrawerID] };
+            games[room].drawer.current = games[room].users[nextDrawerID];
         } else {
-            game.drawer.current = null;
+            games[room].drawer.current = null;
         }
-        game.state = "choosingCategory"
-        io.emit('gameDetails', game);
+        games[room].state = "choosingCategory"
+        io.in(room).emit('gameDetails', games[room]);
 
     }
 
-    socket.on('registerUser', (name) => {
-        game.users[socket.id] = { name, drawer: false, id: socket.id }
-        launchGame(socket.id)
-    });
-
-    socket.on('chooseWord', async (category) => {
-        console.log(category)
-        game.category = category;
-        game.word = await getRandomWord(category)
-        game.path = []
-        game.state = "playing"
-        io.emit('gameDetails', game);
+    socket.on('createRoom', (name) => {
+        const room = Object.keys(games.length);
+        users[socket.id] = { name, drawer: true, id: socket.id, room }
+        games[room] = {
+            room,
+            drawer: { current: users[socket.id], previous: null },
+            word: null,
+            path: [],
+            users: { [socket.id]: users[socket.id] },
+            state: "choosingCategory",
+            categories: [],
+            guesses: [],
+            category: null
+        }
+        socket.join(room)
+        io.in(room).emit('gameDetails', games[room]);
+    })
+    socket.on('joinRoom', ({ name, room }) => {
+        if (games[room]) {
+            users[socket.id] = { name, drawer: false, id: socket.id, room }
+            games[room].users[socket.id] = users[socket.id]
+            if (games[room].drawer.current === null) {
+                passToRandomDrawer(room)
+            }
+            socket.join(room)
+            io.in(room).emit('gameDetails', games[room]);
+        } else {
+            io.emit('notARoom')
+        }
+    })
+    socket.on('chooseWord', async ({ category, room }) => {
+        games[room].category = category;
+        games[room].word = await getRandomWord(category)
+        games[room].path = []
+        games[room].state = "playing"
+        io.in(room).emit('gameDetails', games[room]);
     })
 
     socket.on('addToPath', (point) => {
-        game.path = [...game.path, point];
-        io.emit('updatedPath', game.path)
+        games[room].path = [...games[room].path, point];
+        io.in(room).emit('updatedPath', games[room].path)
     })
 
     socket.on('clearDrawing', () => {
-        console.log("clearing")
-        game.path = [];
-        io.emit('updatedPath', game.path)
+        games[room].path = [];
+        io.in(room).emit('updatedPath', games[room].path)
     })
 
     socket.on('giveUp', () => {
@@ -78,41 +93,43 @@ module.exports = (socket, io) => {
     })
 
     socket.on('wrongGuess', (guess) => {
-        game.guesses.push({
+        games[room].guesses.push({
             word: guess,
-            name: game.users[socket.id].name,
-            id: game.guesses.length
+            name: users[socket.id].name,
+            id: games[room].guesses.length
         })
-        io.emit('gameDetails', game)
+        io.in(room).emit('gameDetails', games[room])
     })
 
     socket.on('endGame', () => {
-        game.users[game.drawer.current.id].drawer = false;
-        game = {
+        games[room].users[game.drawer.current.id].drawer = false;
+        games[room] = {
             drawer: {
-                previous: { ...game.drawer.current },
-                current: { ...game.users[socket.id] }
+                previous: { ...games[room].drawer.current },
+                current: users[socket.id]
             },
             word: null,
             path: [],
             state: "end",
-            users: game.users,
+            users: games[room].users,
             guesses: [],
             category: null
         }
-        io.emit('gameDetails', game);
+        io.in(room).emit('gameDetails', games[room]);
     })
 
     socket.on('resetGame', () => {
-        launchGame(socket.id)
+
+        launchGame(socket.id, users[socket.id].room)
     })
 
     socket.on('disconnect', function () {
         console.log("disconnected")
-        delete game.users[socket.id]
-        if (game.drawer.current && game.drawer.current.id === socket.id) {
+        const { room } = users[socket.id]
+        delete users[socket.id]
+        if (games[room].drawer.current && games[room].drawer.current.id === socket.id) {
             passToRandomDrawer()
         }
-        io.emit('gameDetails', game);
+        io.in(room).emit('gameDetails', game);
     });
 }
