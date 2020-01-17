@@ -11,7 +11,7 @@
     --title-color: #ffffff;
     --title-background: #27544e;
     --app-width: 900px;
-    --app-height: 550px;
+    --app-height: 600px;
 }
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input, button {
@@ -114,7 +114,7 @@ h3 {
 }
 
 .prompt {
-    padding-top: 40px;
+    padding-top: 20px;
     max-height: calc(var(--app-height) * 0.80);
 }
 
@@ -128,6 +128,7 @@ h3 {
 
 .error-message {
     margin-top: 1em;
+    color: var(--error)
 }
 
 .category-container {
@@ -139,7 +140,7 @@ h3 {
 }
 
 button, input[type=button] {
-    background-color: var(--translucent-background-color);
+    background-color: var(--title-background);
     color: var(--color);
     width: calc(var(--app-width) * 0.20);
     height: calc(var(--app-height) * 0.10);

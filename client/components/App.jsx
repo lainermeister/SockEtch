@@ -29,13 +29,15 @@ const App = () => {
     setJoinError(null);
   }, [name]);
 
-  const startSocket = (e) => {
+  const startSocket = (e, option) => {
     e.preventDefault();
+    setJoinError(null);
     if (name === "") {
       setJoinError("Please enter your name to join.");
     } else {
-      if (joiningRoom) {
-        socket.emit("joinRoom", { name, room });
+      if (option !== "create") {
+        console.log("joining room" + joiningRoom);
+        socket.emit("joinRoom", { name, room: joiningRoom });
       } else {
         socket.emit("createRoom", name);
       }
@@ -72,13 +74,13 @@ const App = () => {
   const addToPath = (point) => {
     if (socket.id === drawer.current.id) {
       point.color = color;
-      socket.emit("addToPath", point);
+      socket.emit("addToPath", { room, point });
     }
   };
 
   const renderStartPrompt = () => {
     return (
-      <form className="prompt" onSubmit={startSocket}>
+      <form className="prompt" onSubmit={(e) => e.preventDefault()}>
         <h2>Enter your name:</h2>
         <div>
           <input
@@ -90,46 +92,66 @@ const App = () => {
         </div>
         <div>
           {joiningRoom === null ? (
-            <input
-              type="button"
-              value="Join Room"
-              onClick={(e) => startSocket(e, "join")}
-            />
-          ) : (
             <div>
-              <label>Enter Room ID:</label>
               <input
-                type="text"
-                className="textbox"
-                value={joiningRoom}
-                onChange={(e) => setJoiningRoom(e.target.value)}
+                type="button"
+                value="Join Room"
+                onClick={() => setJoiningRoom("")}
               />
             </div>
+          ) : (
+            <div>
+              <div>
+                <h2>Enter Room ID:</h2>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  className="textbox"
+                  value={joiningRoom}
+                  onChange={(e) => setJoiningRoom(e.target.value)}
+                />
+              </div>
+              <div>
+                <input
+                  type="button"
+                  value={`Join ${joiningRoom}`}
+                  onClick={(e) => startSocket(e, "join")}
+                />
+              </div>
+            </div>
           )}
-          <input type="button" value="Create Room" onClick={startSocket} />
-        </div>
-        {joinError ? (
-          <div className="error-message">
-            <label>{joinError}</label>
+          <div>
+            <input
+              type="button"
+              value="Create Room"
+              onClick={(e) => {
+                startSocket(e, "create");
+              }}
+            />
           </div>
-        ) : (
-          <></>
-        )}
+          {joinError ? (
+            <div className="error-message">
+              <label>{joinError}</label>
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
       </form>
     );
   };
   const renderChoosingCategory = () => {
-    console.log(`categories ${categories}`);
+    console.log(`categories ${categories}, room ${room}`);
     if (drawer.current.id === socket.id) {
       return (
         <div className="prompt">
-          <h2>You've been chosen to draw! </h2>
-          <h3>Please pick a category: </h3>
+          <h3>You've been chosen to draw! Please pick a category: </h3>
           {categories.map((category) => (
             <div className="category-container" key={category}>
               <button
                 className="category"
-                onClick={() => socket.emit("chooseWord", category)}
+                onClick={() => socket.emit("chooseWord", { category, room })}
               >
                 {category}
               </button>
@@ -157,10 +179,10 @@ const App = () => {
             <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
             <Path path={path} />
             <div id="bottom-buttons">
-              <button onClick={() => socket.emit("clearDrawing")}>
+              <button onClick={() => socket.emit("clearDrawing", room)}>
                 Clear Drawing
               </button>
-              <button onClick={() => socket.emit("giveUp")}>
+              <button onClick={() => socket.emit("giveUp", room)}>
                 Give Up &nbsp;&nbsp;:(
               </button>
             </div>
@@ -186,8 +208,10 @@ const App = () => {
             <UserList users={users} />
             <GuessingForm
               word={word}
-              handleWrongGuess={(guess) => socket.emit("wrongGuess", guess)}
-              handleWin={() => socket.emit("endGame")}
+              handleWrongGuess={(guess) =>
+                socket.emit("wrongGuess", { guess, room })
+              }
+              handleWin={() => socket.emit("endGame", room)}
             />
           </div>
         </div>
@@ -204,18 +228,33 @@ const App = () => {
     return (
       <div className="prompt">
         {message}
-        <button onClick={() => socket.emit("resetGame")}>Next Game</button>
+        <button onClick={() => socket.emit("resetGame", room)}>
+          Next Game
+        </button>
       </div>
     );
   };
-  if (gameState === "pre") {
-    return renderStartPrompt();
-  } else if (gameState === "choosingCategory") {
-    return renderChoosingCategory();
-  } else if (gameState === "playing") {
-    return renderPlaying();
-  } else {
-    return renderGameEnd();
-  }
+
+  return (
+    <div>
+      {room !== null ? <h2>Your Room: {room}</h2> : <></>}
+      {gameState === "pre"
+        ? renderStartPrompt()
+        : gameState === "choosingCategory"
+        ? renderChoosingCategory()
+        : gameState === "playing"
+        ? renderPlaying()
+        : renderGameEnd()}
+    </div>
+  );
+  // if (gameState === "pre") {
+  //   return renderStartPrompt();
+  // } else if (gameState === "choosingCategory") {
+  //   return renderChoosingCategory();
+  // } else if (gameState === "playing") {
+  //   return renderPlaying();
+  // } else {
+  //   return renderGameEnd();
+  // }
 };
 export default App;
