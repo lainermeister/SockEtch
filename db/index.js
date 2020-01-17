@@ -8,7 +8,7 @@ module.exports = {
             const categories = [];
             (await db.listCollections()
                 .toArray()).forEach(({ name }) => 
-                name !== "system.indices" ? categories.push(name) : null)
+                name !== "system.indexes" ? categories.push(name) : null)
             return categories;
         } catch (err) { console.log(err) }
     },
