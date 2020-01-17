@@ -2,7 +2,7 @@ let games = {};
 let users = {};
 
 const { getCategories, getRandomWord } = require('../db')
-const { getRandomNumber } = require('../db/helpers')
+const { getRandomNumber, getRandomString } = require('../db/helpers')
 
 module.exports = (socket, io) => {
 
@@ -44,7 +44,15 @@ module.exports = (socket, io) => {
 
     socket.on('createRoom', async (name) => {
         console.log("creating room")
-        const room = Object.keys(games).length;
+        // const room = (await getRandomWord("objects")).toUpperCase();
+        // while (games[room]) {
+        //     room = (await getRandomWord("objects")).toUpperCase();
+        // }
+        const room = (getRandomString(4)).toUpperCase();
+        while (games[room]) {
+            room = (getRandomString(4)).toUpperCase();
+        }
+        console.log(room)
         users[socket.id] = { name, drawer: true, id: socket.id, room }
         games[room] = {
             room,
@@ -61,6 +69,7 @@ module.exports = (socket, io) => {
         io.in(room).emit('gameDetails', games[room]);
     })
     socket.on('joinRoom', ({ name, room }) => {
+        room = room.toUpperCase()
         console.log("joining: " + room)
         console.log(JSON.stringify(games[room]))
         if (games[room]) {

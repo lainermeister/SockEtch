@@ -80,65 +80,69 @@ const App = () => {
 
   const renderStartPrompt = () => {
     return (
-      <form className="prompt" onSubmit={(e) => e.preventDefault()}>
-        <h2>Enter your name:</h2>
-        <div>
-          <input
-            type="text"
-            className="textbox"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div>
-          {joiningRoom === null ? (
-            <div>
-              <input
-                type="button"
-                value="Join Room"
-                onClick={() => setJoiningRoom("")}
-              />
-            </div>
-          ) : (
-            <div>
-              <div>
-                <h2>Enter Room ID:</h2>
-              </div>
-              <div>
-                <input
-                  type="text"
-                  className="textbox"
-                  value={joiningRoom}
-                  onChange={(e) => setJoiningRoom(e.target.value)}
-                />
-              </div>
+      <>
+        <h2>Your Name:</h2>
+        <form className="prompt" onSubmit={(e) => e.preventDefault()}>
+          <div>
+            <input
+              type="text"
+              className="textbox"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            {joiningRoom === null ? (
               <div>
                 <input
                   type="button"
-                  value={`Join ${joiningRoom}`}
-                  onClick={(e) => startSocket(e, "join")}
+                  value="Join Room"
+                  onClick={() => setJoiningRoom("")}
                 />
               </div>
+            ) : (
+              <div>
+                <div>
+                  <h2>Room ID:</h2>
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    className="textbox"
+                    value={joiningRoom}
+                    onChange={(e) =>
+                      setJoiningRoom(e.target.value.toUpperCase())
+                    }
+                  />
+                </div>
+                <div>
+                  <input
+                    type="button"
+                    value={`Join ${joiningRoom}`}
+                    onClick={(e) => startSocket(e, "join")}
+                  />
+                </div>
+              </div>
+            )}
+            <div>
+              <input
+                type="button"
+                value="Create Room"
+                onClick={(e) => {
+                  startSocket(e, "create");
+                }}
+              />
             </div>
-          )}
-          <div>
-            <input
-              type="button"
-              value="Create Room"
-              onClick={(e) => {
-                startSocket(e, "create");
-              }}
-            />
+            {joinError ? (
+              <div className="error-message">
+                <label>{joinError}</label>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
-          {joinError ? (
-            <div className="error-message">
-              <label>{joinError}</label>
-            </div>
-          ) : (
-            <></>
-          )}
-        </div>
-      </form>
+        </form>
+      </>
     );
   };
   const renderChoosingCategory = () => {
@@ -162,7 +166,7 @@ const App = () => {
     } else {
       return (
         <div className="prompt">
-          <h2>{drawer.current.name} is picking a category</h2>
+          <h3>Please hold while {drawer.current.name} selects a category...</h3>
         </div>
       );
     }
@@ -238,13 +242,15 @@ const App = () => {
   return (
     <div>
       {room !== null ? <h2>Your Room: {room}</h2> : <></>}
-      {gameState === "pre"
-        ? renderStartPrompt()
-        : gameState === "choosingCategory"
-        ? renderChoosingCategory()
-        : gameState === "playing"
-        ? renderPlaying()
-        : renderGameEnd()}
+      <div id="dynamic-area">
+        {gameState === "pre"
+          ? renderStartPrompt()
+          : gameState === "choosingCategory"
+          ? renderChoosingCategory()
+          : gameState === "playing"
+          ? renderPlaying()
+          : renderGameEnd()}
+      </div>
     </div>
   );
   // if (gameState === "pre") {

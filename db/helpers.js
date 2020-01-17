@@ -3,6 +3,13 @@ const alphabet = 'abcdefghijklmnopqrstuvwy'
 
 module.exports.getRandomNumber = (n) => Math.floor(n * Math.random())
 
+module.exports.getRandomString = (n) =>
+    Array(n).fill(null).map(() =>
+        alphabet[module.exports.getRandomNumber(alphabet.length)]
+    ).join("")
+
+
+
 // module.exports = {
 //     getRandomWord: () => {
 //         const startChar = alphabet[getRandomNumber(alphabet.length)]
