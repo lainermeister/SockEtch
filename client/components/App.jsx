@@ -241,7 +241,13 @@ const App = () => {
 
   return (
     <div>
-      {room !== null ? <h2>Your Room: {room}</h2> : <></>}
+      {room !== null ? (
+        <div id="room-display">
+          <h2>Your Room: {room}</h2>
+        </div>
+      ) : (
+        <></>
+      )}
       <div id="dynamic-area">
         {gameState === "pre"
           ? renderStartPrompt()
@@ -253,14 +259,5 @@ const App = () => {
       </div>
     </div>
   );
-  // if (gameState === "pre") {
-  //   return renderStartPrompt();
-  // } else if (gameState === "choosingCategory") {
-  //   return renderChoosingCategory();
-  // } else if (gameState === "playing") {
-  //   return renderPlaying();
-  // } else {
-  //   return renderGameEnd();
-  // }
 };
 export default App;

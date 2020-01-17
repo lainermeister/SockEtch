@@ -4,7 +4,7 @@
     --background-color: rgb(37, 37, 37);
     --translucent-background-color: rgba(80, 80, 80, 0.6);
     --primary-accent-color: #949494;
-    --secondary-background-color: rgba(51, 51, 51, 0.7);
+    --secondary-background-color: rgba(80, 80, 80, 0.34);
     --error: #ffa600;
     --highlighted: #8a6a30;
     --link-color: #6fa5a5;
@@ -40,7 +40,7 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
 
 body {
     line-height: 1;
-    background-color: var(--secondary-background-color);
+    background-color: var(--background-color);
     color: var(--color);
     font-family: 'Source Sans Pro', san-serif;
 }
@@ -76,13 +76,14 @@ h3 {
 
 #app-container {
     width: var(--app-width);
-    height: var(-app-height);
+    min-height: var(-app-height);
+    max-height: var(-app-height);
     margin: auto;
     margin-top: 15px;
     background-color: var(--background-color);
     align-items: center;
     justify-content: space-between;
-    box-shadow: 1px 1px 2px 2px rgba(71, 71, 71, 0.75);
+    /* box-shadow: 1px 1px 2px 2px rgba(71, 71, 71, 0.75); */
 }
 
 #site-title {
@@ -100,8 +101,16 @@ h3 {
     height: calc(var(--app-height) * 0.85);
 }
 
+#room-display {
+    background-color: var(--secondary-background-color);
+    max-width: calc(var(--app-width) * .5);
+    padding: 0.3em;
+    margin: auto;
+    border-radius: 2em;
+}
+
 #dynamic-area {
-    margin-top: calc(var(--app-height) * 0.05);
+    margin-top: calc(var(--app-height) * 0.03);
 }
 
 #play-area {
