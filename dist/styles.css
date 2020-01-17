@@ -5,7 +5,7 @@
     --translucent-background-color: rgba(80, 80, 80, 0.6);
     --primary-accent-color: #949494;
     --secondary-background-color: rgba(51, 51, 51, 0.7);
-    --error: #ff0000;
+    --error: #ffa600;
     --highlighted: #8a6a30;
     --link-color: #6fa5a5;
     --title-color: #ffffff;
@@ -14,7 +14,7 @@
     --app-height: 600px;
 }
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input, button {
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video, input, button, input[type=button] {
     margin: 0;
     padding: 0;
     border: 0;
@@ -87,7 +87,7 @@ h3 {
 
 #site-title {
     color: var(--title-color);
-    font-size: 2.7em;
+    font-size: 3em;
     padding: .3em;
     text-align: center;
     font-family: 'Shadows Into Light', cursive;
@@ -215,6 +215,7 @@ button, input[type=button] {
 
 .guess-alert {
     margin: .4em;
+    color: var(--error)
 }
 
 .username {
