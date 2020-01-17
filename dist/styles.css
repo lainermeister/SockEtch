@@ -120,7 +120,7 @@ h3 {
 
 .textbox {
     background-color: var(--translucent-background-color);
-    width: calc(var(--app-height) * 0.40);
+    width: calc(var(--app-width) * 0.25);
     height: calc(var(--app-height) * 0.10);
     color: var(--color);
     text-align: center;
@@ -141,7 +141,7 @@ h3 {
 button, input[type=button] {
     background-color: var(--translucent-background-color);
     color: var(--color);
-    width: calc(var(--app-height) * 0.30);
+    width: calc(var(--app-width) * 0.20);
     height: calc(var(--app-height) * 0.10);
     font-size: 1em;
     border: 0px;
@@ -153,27 +153,31 @@ button, input[type=button] {
     flex-flow: column wrap;
     align-self: center;
     margin: 0;
+    width: calc(var(--app-width) * 0.07)
 }
 
 .color-buttons {
     width: 50px;
     height: 50px;
-    margin: 0;
+    margin: .5em 0em;
+    border-radius: 100%;
 }
 
 #right-col {
     min-height: 100%;
     max-height: 100%;
+    width: calc(var(--app-width) * 0.23);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     text-align: left;
+    padding: 0.3em
 }
 
 #user-list {
     display: flex;
     flex-direction: column;
-    height: 50%;
+    height: 40%;
     flex-wrap: nowrap;
     overflow: scroll;
 }

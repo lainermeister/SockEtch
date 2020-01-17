@@ -7,8 +7,8 @@ module.exports = {
             !db ? db = await client.connect() : null;
             const categories = [];
             (await db.listCollections()
-                .toArray()).forEach(({ name }) => 
-                name !== "system.indexes" ? categories.push(name) : null)
+                .toArray()).forEach(({ name }) =>
+                    name !== "system.indexes" ? categories.push(name) : null)
             return categories;
         } catch (err) { console.log(err) }
     },
@@ -19,6 +19,13 @@ module.exports = {
             const word = ((await db.collection(category).find()
                 .toArray())[getRandomNumber(count)].word)
             return word;
+        } catch (err) { console.log(err) }
+    },
+    addAWord: async (word) => {
+        try {
+            !db ? db = await client.connect() : null;
+            await db.collection("user generated").insertOne({ word: word.toLowerCase() })
+            return true;
         } catch (err) { console.log(err) }
     }
 };
