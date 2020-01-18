@@ -1,8 +1,8 @@
 import React from "react";
-import DrawingBoard from "../DrawingBoard.jsx";
-import Path from "../Path.jsx";
-import UserList from "../UserList";
-import GuessingForm from "../GuessingForm.jsx";
+import DrawingBoard from "./components/DrawingBoard.jsx";
+import Path from "./components/Path.jsx";
+import UserList from "./components/UserList";
+import GuessingForm from "./components/GuessingForm.jsx";
 
 const GuessView = ({ game, emit, drawerName }) => {
   return (

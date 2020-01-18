@@ -50,6 +50,7 @@ const Routes = ({
   } else {
     return (
       <GameEnd
+        emit={emit}
         isDrawer={isDrawer}
         wasDrawer={wasDrawer}
         drawerName={game.drawer.current.name}
