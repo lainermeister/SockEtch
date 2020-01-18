@@ -9,7 +9,11 @@ const StartPrompt = ({ startSocket, joinError, setJoinError }) => {
   }, [name]);
   return (
     <>
-      <form className="prompt" onSubmit={(e) => e.preventDefault()}>
+      <form
+        className="prompt"
+        onSubmit={(e) => e.preventDefault()}
+        autocomplete="off"
+      >
         <h2>Your Name:</h2>
         <div>
           <input

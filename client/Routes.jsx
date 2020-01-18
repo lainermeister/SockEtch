@@ -1,5 +1,4 @@
 import React from "react";
-
 import StartPrompt from "./views/StartPrompt";
 import Disconnected from "./views/Disconnected";
 import ChooseCategory from "./views/ChooseCategory";
