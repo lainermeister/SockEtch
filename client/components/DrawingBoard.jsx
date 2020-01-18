@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 
-const DrawingBoard = ({ addToPath, setGuessing }) => {
+const DrawingBoard = ({ addToPath }) => {
   const [drawing, setDrawing] = useState(false);
 
   const handleDrawStart = (e) => {
     setDrawing(true);
-    setGuessing(true);
     addToPath({
       x: e.nativeEvent.offsetX,
       y: e.nativeEvent.offsetY

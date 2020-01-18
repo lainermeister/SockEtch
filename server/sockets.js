@@ -1,6 +1,5 @@
 let games = {};
 let users = {};
-
 const { getCategories, getRandomWord } = require('../db')
 const { getRandomNumber, getRandomString } = require('../db/helpers')
 
@@ -23,8 +22,6 @@ module.exports = (socket, io) => {
     }
 
     const passToRandomDrawer = (room) => {
-        console.log("pass to another drawer")
-        console.log(JSON.stringify(games[room]))
         if (games[room]) {
             games[room].word = null;
             games[room].drawer.previous = { ...games[room].drawer.current }
@@ -43,16 +40,10 @@ module.exports = (socket, io) => {
     }
 
     socket.on('createRoom', async (name) => {
-        console.log("creating room")
-        // const room = (await getRandomWord("objects")).toUpperCase();
-        // while (games[room]) {
-        //     room = (await getRandomWord("objects")).toUpperCase();
-        // }
         const room = (getRandomString(3)).toUpperCase();
         while (games[room]) {
             room = (getRandomString(3)).toUpperCase();
         }
-        console.log(room)
         users[socket.id] = { name, drawer: true, id: socket.id, room }
         games[room] = {
             room,
@@ -68,15 +59,13 @@ module.exports = (socket, io) => {
         socket.join(room)
         io.in(room).emit('gameDetails', games[room]);
     })
+
     socket.on('joinRoom', ({ name, room }) => {
         room = room.toUpperCase()
-        console.log("joining: " + room)
-        console.log(JSON.stringify(games[room]))
         if (games[room]) {
             users[socket.id] = { name, drawer: false, id: socket.id, room }
             games[room].users[socket.id] = users[socket.id]
             if (games[room].drawer.current === null) {
-                console.log(room)
                 passToRandomDrawer(room)
             }
             socket.join(room)
@@ -85,8 +74,8 @@ module.exports = (socket, io) => {
             io.emit('notARoom')
         }
     })
+
     socket.on('chooseWord', async ({ category, room }) => {
-        console.log(room)
         games[room].category = category;
         games[room].word = await getRandomWord(category)
         games[room].path = []
@@ -96,16 +85,7 @@ module.exports = (socket, io) => {
 
     socket.on('addToPath', ({ room, point }) => {
         games[room].path = [...games[room].path, point];
-        io.in(room).emit('updatedPath', games[room].path)
-    })
-
-    socket.on('clearDrawing', (room) => {
-        games[room].path = [];
-        io.in(room).emit('updatedPath', games[room].path)
-    })
-
-    socket.on('giveUp', (room) => {
-        passToRandomDrawer(room)
+        io.in(room).emit('gameDetails', games[room])
     })
 
     socket.on('wrongGuess', ({ guess, room }) => {
@@ -115,6 +95,15 @@ module.exports = (socket, io) => {
             id: games[room].guesses.length
         })
         io.in(room).emit('gameDetails', games[room])
+    })
+
+    socket.on('clearDrawing', (room) => {
+        games[room].path = [];
+        io.in(room).emit('gameDetails', games[room])
+    })
+
+    socket.on('giveUp', (room) => {
+        passToRandomDrawer(room)
     })
 
     socket.on('endGame', (room) => {
@@ -141,14 +130,11 @@ module.exports = (socket, io) => {
     })
 
     socket.on('disconnect', function () {
-        console.log("disconnecting" + JSON.stringify(users[socket.id]))
         if (users[socket.id]) {
             const { room } = users[socket.id]
             delete users[socket.id]
             if (games[room]) {
-                console.log(games[room])
                 if (Object.keys(games[room].users).length < 2) {
-                    console.log("last user leaving, deleting room")
                     delete games[room]
                 } else {
                     delete games[room].users[socket.id]

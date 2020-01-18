@@ -11,20 +11,13 @@ import socketIOClient from "socket.io-client";
 const socket = socketIOClient(window.location.href);
 
 const App = () => {
-  const [word, setWord] = useState(null);
-  const [guessing, setGuessing] = useState(false);
-  const [path, setPath] = useState([]);
+  const [game, setGame] = useState(null);
   const [color, setColor] = useState("#F6F7EB");
-  const [gameState, setGameState] = useState("pre");
-  const [drawer, setDrawer] = useState(null);
   const [name, setName] = useState("");
-  const [users, setUsers] = useState({});
-  const [categories, setCategories] = useState([]);
-  const [guesses, setGuesses] = useState([]);
-  const [category, setCategory] = useState(null);
   const [joiningRoom, setJoiningRoom] = useState(null);
   const [joinError, setJoinError] = useState(null);
-  const [room, setRoom] = useState(null);
+  const [disconnected, setDisconnected] = useState(false);
+
   useEffect(() => {
     setJoinError(null);
   }, [name]);
@@ -36,45 +29,24 @@ const App = () => {
       setJoinError("Please enter your name to join.");
     } else {
       if (option !== "create") {
-        console.log("joining room" + joiningRoom);
         socket.emit("joinRoom", { name, room: joiningRoom });
       } else {
         socket.emit("createRoom", name);
       }
-      socket.on(
-        "gameDetails",
-        ({
-          drawer,
-          word,
-          path,
-          users,
-          state,
-          categories,
-          guesses,
-          category,
-          room
-        }) => {
-          setCategories(categories);
-          setWord(word);
-          setDrawer(drawer);
-          setPath(path);
-          setUsers(users);
-          setGameState(state);
-          setGuesses(guesses);
-          setCategory(category);
-          setRoom(room);
-        }
-      );
+      socket.on("gameDetails", (game) => {
+        setGame(game);
+      });
       socket.on("notARoom", () => setJoinError("That is not a valid room."));
-      socket.on("updatedPath", (path) => setPath(path));
-      console.log("my socket is " + socket.id);
+      socket.on("disconnect", () => {
+        setDisconnected(true);
+      });
     }
   };
 
   const addToPath = (point) => {
-    if (socket.id === drawer.current.id) {
+    if (socket.id === game.drawer.current.id) {
       point.color = color;
-      socket.emit("addToPath", { room, point });
+      socket.emit("addToPath", { room: game.room, point });
     }
   };
 
@@ -146,16 +118,20 @@ const App = () => {
     );
   };
   const renderChoosingCategory = () => {
-    console.log(`categories ${categories}, room ${room}`);
-    if (drawer.current.id === socket.id) {
+    if (game.drawer.current.id === socket.id) {
       return (
         <div className="prompt">
           <h3>You've been chosen to draw! Please pick a category: </h3>
-          {categories.map((category) => (
+          {game.categories.map((category) => (
             <div className="category-container" key={category}>
               <button
                 className="category"
-                onClick={() => socket.emit("chooseWord", { category, room })}
+                onClick={() =>
+                  socket.emit("chooseWord", {
+                    category,
+                    room: game.room
+                  })
+                }
               >
                 {category}
               </button>
@@ -166,35 +142,35 @@ const App = () => {
     } else {
       return (
         <div className="prompt">
-          <h3>Please hold while {drawer.current.name} selects a category...</h3>
+          <h3>
+            Please hold while {game.drawer.current.name} selects a category...
+          </h3>
         </div>
       );
     }
   };
 
   const renderPlaying = () => {
-    if (drawer.current.id === socket.id) {
+    if (game.drawer.current.id === socket.id) {
       return (
         <div id="play-area">
           <ColorSelector setColor={setColor} />
           <div id="drawing-col">
-            <h2>{word}</h2>
-
-            <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
-            <Path path={path} />
+            <h2>{game.word}</h2>
+            <DrawingBoard addToPath={addToPath} />
+            <Path path={game.path} />
             <div id="bottom-buttons">
-              <button onClick={() => socket.emit("clearDrawing", room)}>
+              <button onClick={() => socket.emit("clearDrawing", game.room)}>
                 Clear Drawing
               </button>
-              <button onClick={() => socket.emit("giveUp", room)}>
+              <button onClick={() => socket.emit("giveUp", game.room)}>
                 Give Up &nbsp;&nbsp;:(
               </button>
             </div>
           </div>
           <div id="right-col">
-            <UserList users={users} />
-
-            <Guesses guesses={guesses} />
+            <UserList users={game.users} />
+            <Guesses guesses={game.guesses} />
           </div>
         </div>
       );
@@ -202,19 +178,19 @@ const App = () => {
       return (
         <div id="play-area">
           <div id="drawing-col">
-            <h2>{drawer.current.name} is drawing</h2>
-            <DrawingBoard addToPath={addToPath} setGuessing={setGuessing} />
-            <Path path={path} />
-            <h3>Category: {category}</h3>
+            <h2>{game.drawer.current.name} is drawing</h2>
+            <DrawingBoard addToPath={addToPath} />
+            <Path path={game.path} />
+            <h3>Category: {game.category}</h3>
           </div>
           <div id="right-col">
-            <UserList users={users} />
+            <UserList users={game.users} />
             <GuessingForm
-              word={word}
+              word={game.word}
               handleWrongGuess={(guess) =>
-                socket.emit("wrongGuess", { guess, room })
+                socket.emit("wrongGuess", { guess, room: game.room })
               }
-              handleWin={() => socket.emit("endGame", room)}
+              handleWin={() => socket.emit("endGame", game.room)}
             />
           </div>
         </div>
@@ -222,37 +198,49 @@ const App = () => {
     }
   };
   const renderGameEnd = () => {
-    let message = <h2>{drawer.current.name} guessed it!</h2>;
-    if (drawer.previous.id === socket.id) {
-      message = <h2>Great drawing! {drawer.current.name} guessed it!</h2>;
-    } else if (drawer.current.id === socket.id) {
+    let message = <h2>{game.drawer.current.name} guessed it!</h2>;
+    if (game.drawer.previous.id === socket.id) {
+      message = <h2>Great drawing! {game.drawer.current.name} guessed it!</h2>;
+    } else if (game.drawer.current.id === socket.id) {
       message = <h2>Congrats! You guessed it! </h2>;
     }
     return (
       <div className="prompt">
         {message}
-        <button onClick={() => socket.emit("resetGame", room)}>
+        <button onClick={() => socket.emit("resetGame", game.room)}>
           Next Game
         </button>
       </div>
     );
   };
 
+  const renderDisconnected = () => {
+    return (
+      <div className="prompt">
+        <h3>
+          It looks like you've been disconnected. Please refresh your browser.
+        </h3>
+      </div>
+    );
+  };
+
   return (
     <div>
-      {room !== null ? (
+      {game && game.room !== null ? (
         <div id="room-display">
-          <h2>Your Room: {room}</h2>
+          <h2>Your Room: {game.room}</h2>
         </div>
       ) : (
         <></>
       )}
       <div id="dynamic-area">
-        {gameState === "pre"
+        {!game
           ? renderStartPrompt()
-          : gameState === "choosingCategory"
+          : disconnected
+          ? renderDisconnected()
+          : game.state === "choosingCategory"
           ? renderChoosingCategory()
-          : gameState === "playing"
+          : game.state === "playing"
           ? renderPlaying()
           : renderGameEnd()}
       </div>
