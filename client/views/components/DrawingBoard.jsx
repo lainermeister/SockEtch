@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 
-const DrawingBoard = ({ addToPath }) => {
+const DrawingBoard = ({ addToPath, color }) => {
   const [drawing, setDrawing] = useState(false);
 
   const handleDrawStart = (e) => {
     setDrawing(true);
     addToPath({
       x: e.nativeEvent.offsetX,
-      y: e.nativeEvent.offsetY
+      y: e.nativeEvent.offsetY,
+      color
     });
   };
 
@@ -15,7 +16,8 @@ const DrawingBoard = ({ addToPath }) => {
     if (drawing) {
       addToPath({
         x: e.nativeEvent.offsetX,
-        y: e.nativeEvent.offsetY
+        y: e.nativeEvent.offsetY,
+        color
       });
     }
   };
@@ -23,7 +25,8 @@ const DrawingBoard = ({ addToPath }) => {
     setDrawing(false);
     addToPath({
       x: null,
-      y: null
+      y: null,
+      color
     });
   };
   return (
