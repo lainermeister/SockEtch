@@ -4,9 +4,9 @@
 
 Full-stack multiplayer drawing & guessing game.
 
-![Demo](https://user-images.githubusercontent.com/26628913/72670361-6a0a6d00-3a34-11ea-9e37-22b7422bd7c1.gif)
-
 [Deployed on Heroku](https://socketch.herokuapp.com)
+
+![Demo](https://user-images.githubusercontent.com/26628913/72670387-bbb2f780-3a34-11ea-84d4-a1ae96846025.gif)
 
 ## Features
 
